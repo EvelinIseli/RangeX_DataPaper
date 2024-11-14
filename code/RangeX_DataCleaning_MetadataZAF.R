@@ -48,10 +48,10 @@ get_file(node = "bg2mu",
 meta_ZAF21_raw <- read_delim("data/ZAF/RangeX_Metadata_21_22_ZAF.csv") %>%
   clean_names()
 
-#meta_ZAF22_raw <- read_csv("data/ZAF/RangeX_Metadata_22_23_ZAF.csv") %>%  
-#  clean_names()
-meta_ZAF22_raw <- read_csv("/Users/eviseli/Desktop/RangeX_Metadata_ZAF_22_23_final1.csv") %>%  
+meta_ZAF22_raw <- read_csv("data/ZAF/RangeX_Metadata_22_23_ZAF.csv") %>%  
   clean_names()
+#meta_ZAF22_raw <- read_csv("/Users/eviseli/Desktop/RangeX_Metadata_ZAF_22_23_final1.csv") %>%  
+#  clean_names()
 
 
 plant_id_ZAF_raw <- read_csv("data/ZAF/RangeX_Metadata_PlantID_ZAF.csv") %>%
@@ -64,9 +64,15 @@ plant_id_ZAF <- plant_id_ZAF_raw
 
 ### PREPARE FILE ###############################################################
 
-# add plant ID to current 2021/ 22 metadata (which only has one position ID, 1)
+# make unique_position_ID new (there's dublicates, somehow), add plant ID to current 2021/ 22 metadata (which only has one position ID, 1)
 meta_ZAF21 <- meta_ZAF21 %>%
-  left_join(plant_id_ZAF[, c(1:3)], by = "unique_position_id" )
+  mutate(block_id = str_pad(block_id_original, 2, pad = "0"),
+         position_id = str_pad(position_id_original, 2, pad = "0"),
+         unique_position_id = paste("ZAF", site, treat_warming, treat_competition, added_focals, block_id, position_id, sep = ".")) %>%
+  group_by(unique_position_id) %>%
+  mutate(duplicated = n() > 1)
+  
+# PROBLEM: block, plot and position ID are unique, but the treatment specifications are not
 
 
 # make date into date, create new unique_plant_id (position_ID + plant_ID)
@@ -78,8 +84,11 @@ meta_ZAF21 <- meta_ZAF21 %>%
 
 
 # do the same for the 2022/ 23 data
-# add plant ID to current 2022/ 23 metadata (which only has a position ID)
+# make unique_position_ID new (there's dublicates, somehow), add plant ID to current 2022/ 23 metadata (which only has a position ID)
 meta_ZAF22 <- meta_ZAF22 %>%
+  mutate(block_id = paste0("0", block_id_original),
+         position_id_original = paste0("0", position_id_original),
+         unique_position_id = paste("ZAF", site, treat_warming, treat_competition)) %>%
   left_join(plant_id_ZAF[, c(1, 4, 5)], by = "unique_position_id" )
 
 # make date into date, create new unique_plant_id (position_ID + plant_ID)
@@ -113,7 +122,6 @@ meta_ZAF21_22 <- bind_rows(meta_ZAF21, meta_ZAF22) %>%
 
 # save
 write_csv(meta_ZAF21_22, "data/ZAF/RangeX_Metadata_ZAF_clean.csv")
-write_csv(meta_ZAF21_22, "/Users/eviseli/Desktop/RangeX_Metadata_ZAF_clean.csv")
 
 
 
