@@ -54,8 +54,12 @@ get_file(node = "bg2mu",
 meta_ZAF21_raw <- read_delim("data/ZAF/RangeX_Metadata_21_22_ZAF.csv") %>%
   clean_names()
 
-meta_ZAF22_raw <- read_csv("data/ZAF/RangeX_Metadata_22_23_ZAF.csv") %>%  
+#meta_ZAF22_raw <- read_csv("data/ZAF/RangeX_Metadata_22_23_ZAF.csv") %>%  
+#  clean_names()
+
+meta_ZAF22_raw <- read_delim("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/South Africa/Retreat ZAF/RangeX_Metadata_ZAF_22_23_final1.csv") %>%
   clean_names()
+
 
 # plant index
 plant_id_ZAF_raw <- read_csv("data/ZAF/RangeX_Metadata_PlantID_ZAF.csv") %>%
@@ -116,7 +120,7 @@ meta_ZAF21_dubli <- meta_ZAF21 %>%
 
 # extract the cases where unique_plot_id_plant != unique_plot_id
 no_match <- meta_ZAF21 %>%
-  filter(unique_position_id_plant != unique_position_id) # 48 cases
+  filter(unique_position_id_plant != unique_position_id) # 48 cases - can be ignored as correct plot id's are merged on now
 
 # clean up 
 meta_ZAF21 <- meta_ZAF21 %>%
@@ -183,6 +187,7 @@ meta_ZAF22 <- meta_ZAF22 %>%
 
 # add plant ID (planting index) to current 2022/ 23 metadata (which only has one position ID, 1)
 meta_ZAF22_merged <- meta_ZAF22 %>%
+  dplyr::select(-planting_date, -plant_id_original) %>%
   left_join(plant_id_ZAF[, c(1, 4, 5)], by = "unique_position_id" )
 
 # PROBLEM: none

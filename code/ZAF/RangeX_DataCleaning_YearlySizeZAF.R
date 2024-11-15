@@ -101,10 +101,11 @@ raw_dat_YS23_hi <- read_csv("data/ZAF/2023_upper1_ZAF.csv") %>%
 key23 <- read_delim("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/South Africa/Retreat ZAF/RangeX_Metadata_ZAF_22_23_final1.csv") %>%
   clean_names()
 
-
-
 key <- read_delim("data/ZAF/RangeX_FocalMetadata_ZAF_clean.csv") %>%
   clean_names()
+
+# check whether RangeX_Metadata_ZAF_22_23_final1.csv and the same file after processing are identical
+all.equal(key23, key) # of course not, must be pre-processed
 
 # define useful vector
 
@@ -327,9 +328,17 @@ key23 <- key23 %>%
 #  tidylog::filter(plant_id_original == max(plant_id_original)) 
   
 
+
+
+###*************************************************************************----
+
 # REMAINING PROBLEM: Using RangeX_Metadata_ZAF_22_23_final1.csv works alright, but the cleaned and 
 # merged metadata (based on RangeX_Metadata_ZAF_22_23_final1.csv) still doesn't despite fixing the
 # merging error.
+
+###*************************************************************************----
+
+
 
 
 # merge treatments to 2023 size data frame
