@@ -110,7 +110,7 @@ meta_ZAF21 <- meta_ZAF21_raw %>%
 # the 20 non-matching rows are the controll plots
 
 # check for duplicates
-meta_ZAF1_dubli <- meta_ZAF21 %>%
+meta_ZAF21_dubli <- meta_ZAF21 %>%
   group_by(unique_position_id) %>% # unique_position_id_plant, unique_position_id none
   mutate(duplicated = n() > 1)
 
@@ -119,7 +119,7 @@ no_match <- meta_ZAF21 %>%
   filter(unique_position_id_plant != unique_position_id) # 48 cases
 
 # clean up 
-meta_ZAF_21 <- meta_ZAF21 %>%
+meta_ZAF21 <- meta_ZAF21 %>%
   select(-contains("_plant"))
 
 # add plant ID (planting index) to current 2021/ 22 metadata (which only has one position ID, 1)
@@ -178,7 +178,7 @@ no_match <- meta_ZAF22 %>%
   filter(unique_position_id_plant != unique_position_id) # 48 cases
 
 # clean up 
-meta_ZAF_22 <- meta_ZAF22 %>%
+meta_ZAF22 <- meta_ZAF22 %>%
   select(-contains("_plant"))
 
 # add plant ID (planting index) to current 2022/ 23 metadata (which only has one position ID, 1)
