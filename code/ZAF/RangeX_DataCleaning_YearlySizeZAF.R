@@ -28,34 +28,31 @@ library(dataDownloader)
 
 # download data from OSF to computer
 get_file(node = "bg2mu",
-         file = "2021_2_data_lowSite.csv",
+         file = "2021_2_data_lowSite_ZAF.csv",
          path = "data/ZAF",
-         remote_path = "focal_level/demographics/raw data/ZAF") # high site 2021/22
+         remote_path = "focal_level/ZAF/raw") # high site 2021/22
 
 get_file(node = "bg2mu",
-         file = "2021_2_data_highSite.csv",
+         file = "2021_2_data_highSite_ZAF.csv",
          path = "data/ZAF",
-         remote_path = "focal_level/demographics/raw data/ZAF") # high site 2021/22
+         remote_path = "focal_level/ZAF/raw") # high site 2021/22
 
 get_file(node = "bg2mu",
-         file = "2023_data_lowSite.csv",
+         file = "2023_upper1_ZAF.csv",
          path = "data/ZAF",
-         remote_path = "focal_level/demographics/raw data/ZAF") # high site 2022/23
+         remote_path = "focal_level/ZAF/raw") # high site 2022/23
 
 get_file(node = "bg2mu",
-         file = "2023_data_highSite.csv",
+         file = "2023_lower1_ZAF.csv",
          path = "data/ZAF",
-         remote_path = "focal_level/demographics/raw data/ZAF") # high site 2022/23
-
-# get_file(node = "bg2mu",
-#          file = "RangeX_Metadata_ZAF_clean.csv",
-#          path = "data/ZAF",
-#          remote_path = "metadata")
+         remote_path = "focal_level/ZAF/raw") # high site 2022/23
 
 get_file(node = "bg2mu",
-         file = "RangeX_Metadata_ZAF_22_23_final.csv",
-         path = "data/ZAF",
-         remote_path = "metadata")
+        file = "RangeX_FocalMetadata_ZAF_clean.csv",
+        path = "data/ZAF",
+        remote_path = "metadata/ZAF/clean")
+
+
 
 
 
@@ -68,10 +65,10 @@ get_file(node = "bg2mu",
 # raw_dat_YS21_hi <- read_csv("data/ZAF/2021_2_data_highSite.csv") %>%
 #   clean_names()
 
-raw_dat_YS21_lo <- read_delim("data/ZAFdata_24/2021_2_data_lowSite_ZAF.csv") %>%
+raw_dat_YS21_lo <- read_delim("data/ZAF/2021_2_data_lowSite_ZAF.csv") %>%
   clean_names()
 
-raw_dat_YS21_hi <- read_delim("data/ZAFdata_24/2021_2_data_highSite_ZAF.csv") %>%
+raw_dat_YS21_hi <- read_delim("data/ZAF/2021_2_data_highSite_ZAF.csv") %>%
   clean_names()
 
 # raw_dat_YS23_lo <- read_csv("data/ZAF/2023_data_lowSite.csv") %>%
@@ -80,10 +77,10 @@ raw_dat_YS21_hi <- read_delim("data/ZAFdata_24/2021_2_data_highSite_ZAF.csv") %>
 # raw_dat_YS23_hi <- read_csv("data/ZAF/2023_data_highSite.csv") %>%
 #   clean_names()
 
-raw_dat_YS23_lo <- read_csv("data/ZAFdata_24/2023_lower1_ZAF.csv") %>%
+raw_dat_YS23_lo <- read_csv("data/ZAF/2023_lower1_ZAF.csv") %>%
   clean_names()
 
-raw_dat_YS23_hi <- read_csv("data/ZAFdata_24/2023_upper1_ZAF.csv") %>%
+raw_dat_YS23_hi <- read_csv("data/ZAF/2023_upper1_ZAF.csv") %>%
   clean_names()
 
 
@@ -95,10 +92,18 @@ raw_dat_YS23_hi <- read_csv("data/ZAFdata_24/2023_upper1_ZAF.csv") %>%
 # key23 <- read_csv("data/ZAF/RangeX_Metadata_ZAF_22_23_final_3.csv") %>%
 #   clean_names()
 
-key21 <- read_delim("data/ZAFdata_24/RangeX_Metadata_21_22_ZAF.csv") %>%
+#key21 <- read_delim("data/ZAFdata_24/RangeX_Metadata_21_22_ZAF.csv") %>%
+#  clean_names()
+#
+#key23 <- read_delim("data/ZAF/RangeX_Metadata_ZAF_22_23_final1.csv") %>%
+#  clean_names()
+
+key23 <- read_delim("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/South Africa/Retreat ZAF/RangeX_Metadata_ZAF_22_23_final1.csv") %>%
   clean_names()
 
-key23 <- read_delim("data/ZAFdata_24/RangeX_Metadata_ZAF_22_23_final1.csv") %>%
+
+
+key <- read_delim("data/ZAF/RangeX_FocalMetadata_ZAF_clean.csv") %>%
   clean_names()
 
 # define useful vector
@@ -167,8 +172,6 @@ dat_YS21 <- dat_YS21 %>%
   separate_wider_delim(plot, delim = ".", names = c("block_id_original", "plot_id_original")) #%>%
   #dplyr::select(-"species") #-"month", -"year", 
 
-
-
 # change them to new names
 dat_YS21 <- dat_YS21 %>%
   rename("height_vegetative_str" = "vh",
@@ -190,23 +193,26 @@ dat_YS21[, missing_col] <- NA
 
 ### ADD TREATMENTS ETC. ########################################################
 
-# prepare treatment key
-key <- key21 %>%
+# prepare treatment key & filter out 2021/ 22 metadata (there will be merging problems otherwise)
+key21 <- key %>%
   filter(region == "ZAF") %>%
-  mutate(plot_id_original = paste(),
-         block_id_original = as.character(block_id_original),
+  mutate(block_id_original = as.character(block_id_original),
          position_id_original = as.integer(position_id_original),
          plot_id_original = as.character(plot_id_original),
-         plant_id_original = as.character(plant_id_original))
-
-# filter out 2021/ 22 metadata (there will be merging problems otherwise)
-key_21 <- key %>%
+         plant_id_original = as.character(plant_id_original)) %>%
   filter(planting_date == "2021-11-17")
 
 # merge treatments to 2021 size data frame
 dat_YS21_merged <- left_join(dat_YS21 |> 
-                               rename("sp" = species), key_21, by = c("region", "site", "block_id_original", "plot_id_original", "position_id_original"))
+                               rename("sp" = species), key21, by = c("region", "site", "block_id_original", "plot_id_original", "position_id_original"))
 
+# check whether species are correct
+check_sp <- dat_YS21_merged %>%
+  dplyr::select(species, sp) %>%
+  distinct(species, sp)
+
+# REMAINING PROBLEMS:
+# eracap contains Eragrostis capensis as well as Eragrostis curvula
 
 ### MISSING ENTRIES/ VALUES/ NA's ##############################################
 
@@ -259,11 +265,6 @@ dat_YS23_lo <- dat_YS23_lo %>%
 
 
 
-### check warning: "mutate: converted 'vw_oct_22' from character to double (2 new NA) 
-### converted 'vw_march_23' from character to double (1 new NA)
-
-
-
 # merge high and low data sets
 dat_YS23 <- bind_rows(dat_YS23_hi, dat_YS23_lo)
 
@@ -277,13 +278,11 @@ dat_YS23 <- dat_YS23 %>%
   pivot_wider(names_from = variable,
               values_from = value)
 
-
 # make some manipulations to be able to merge key on
 dat_YS23 <- dat_YS23 %>%
-  mutate(region = "ZAF") #%>%
-  #dplyr::select(-"species") #-"month", -"year", 
-
-
+  mutate(region = "ZAF") %>%
+  rename("plot_id_original" = "plot_id", "block_id_original" = "block_id",
+         "position_id_original" = "position_id")
 
 # change them to new names
 dat_YS23 <- dat_YS23 %>%
@@ -305,25 +304,45 @@ dat_YS23[, missing_col] <- NA
 ### ADD TREATMENTS ETC. ########################################################
 
 # prepare treatment key
-key23 <- key %>%
+key23 <- key23 %>%
   rename("plot_id" = plot_id_original) |> 
-  mutate(block_id = as.character(block_id),
-         position_id = as.character(position_id),
-         plot_id = as.character(plot_id),
+  mutate(block_id_original = as.character(block_id),
+         position_id_original = as.character(position_id),
+         plot_id_original = as.character(plot_id),
          plant_id_original = as.character(plant_id_original)) |> 
   # grab plant replacement, group by unique position id and filter for largest number, which is the plant that was replaced
   mutate(ind_nr = stringr::str_extract(unique_plant_id, stringr::regex("(\\d+)(?!.*\\d)"))) |> 
-  group_by(unique_position_id, region, site, block_id, plot_id, position_id, species) |> 
+  group_by(unique_position_id, region, site, block_id_original, plot_id_original, position_id_original, species) |> 
   tidylog::summarise(ind_nr = max(ind_nr)) |> 
   mutate(unique_plant_id = paste0(unique_position_id, ".", ind_nr))
 
-# filter out 2021/ 22 metadata (there will be merging problems otherwise)
-# key_21 <- key %>%
-#   filter(planting_date == "2021-11-17")
+## make key out of clean metadata
+#key23 <- key %>%
+#  mutate(block_id_original = as.character(block_id_original),
+#         position_id_original = as.character(position_id_original),
+#         plot_id_original = as.character(plot_id_original),
+#         plant_id_original = as.character(plant_id_original)) %>%
+#  group_by(region, site, block_id_original, plot_id_original, position_id_original,
+#           unique_position_id, treat_warming, treat_competition, unique_plot_id) %>%
+#  tidylog::filter(plant_id_original == max(plant_id_original)) 
+  
 
-# merge treatments to 2021 size data frame
+# REMAINING PROBLEM: Using RangeX_Metadata_ZAF_22_23_final1.csv works alright, but the cleaned and 
+# merged metadata (based on RangeX_Metadata_ZAF_22_23_final1.csv) still doesn't despite fixing the
+# merging error.
+
+
+# merge treatments to 2023 size data frame
 dat_YS23_merged <- tidylog::left_join(dat_YS23 |> 
-                     rename("sp" = species), key23, by = c("region", "site", "block_id", "plot_id", "position_id"))
+                     rename("sp" = species), key23, by = c("region", "site", "block_id_original", "plot_id_original", "position_id_original"))
+
+# check whether species are correct
+check_sp <- dat_YS23_merged %>%
+  dplyr::select(species, sp) %>%
+  distinct(species, sp)
+
+# REMAINING PROBLEMS:
+# everything
 
 
 dat_YS23_merged |> 
