@@ -43,7 +43,8 @@ get_file(node = "bg2mu",
          remote_path = "focal_level/ZAF/raw") # high site 2022/23
 
 get_file(node = "bg2mu",
-         file = "2023_upper1_ZAF.csv",
+
+         file = "2023_lower1_ZAF.csv",
          path = "data/ZAF",
          remote_path = "focal_level/ZAF/raw") # high site 2022/23
 
@@ -55,8 +56,28 @@ get_file(node = "bg2mu",
 
 
 
+
 # import data into R studio
 # load demographic data
+
+# raw_dat_YS21_lo <- read_csv("data/ZAF/2021_2_data_lowSite.csv") %>%
+#   clean_names()
+# 
+# raw_dat_YS21_hi <- read_csv("data/ZAF/2021_2_data_highSite.csv") %>%
+#   clean_names()
+
+raw_dat_YS21_lo <- read_delim("data/ZAF/2021_2_data_lowSite_ZAF.csv") %>%
+  clean_names()
+
+raw_dat_YS21_hi <- read_delim("data/ZAF/2021_2_data_highSite_ZAF.csv") %>%
+  clean_names()
+
+# raw_dat_YS23_lo <- read_csv("data/ZAF/2023_data_lowSite.csv") %>%
+#   clean_names()
+# 
+# raw_dat_YS23_hi <- read_csv("data/ZAF/2023_data_highSite.csv") %>%
+#   clean_names()
+
 raw_dat_YS21_lo <- read_delim("data/ZAFdata_24/2021_2_data_lowSite_ZAF.csv") %>%
   clean_names() |> 
   mutate(species = str_trim(species, "left"),
@@ -67,15 +88,42 @@ raw_dat_YS21_hi <- read_delim("data/ZAFdata_24/2021_2_data_highSite_ZAF.csv") %>
   mutate(species = str_trim(species, "left"),
          species = str_trim(species, "right"))
 
-raw_dat_YS23_lo <- read_csv("data/ZAFdata_24/2023_lower1_ZAF.csv") %>%
+
+raw_dat_YS23_lo <- read_csv("data/ZAF/2023_lower1_ZAF.csv") %>%
   clean_names()
 
-raw_dat_YS23_hi <- read_csv("data/ZAFdata_24/2023_upper1_ZAF.csv") %>%
+raw_dat_YS23_hi <- read_csv("data/ZAF/2023_upper1_ZAF.csv") %>%
+  clean_names()
+
+
+
+
+# load treatment key
+# key21 <- read_csv("data/ZAF/RangeX_Metadata_ZAF_clean.csv") %>%
+#   clean_names()
+# 
+# key23 <- read_csv("data/ZAF/RangeX_Metadata_ZAF_22_23_final_3.csv") %>%
+#   clean_names()
+
+#key21 <- read_delim("data/ZAFdata_24/RangeX_Metadata_21_22_ZAF.csv") %>%
+#  clean_names()
+#
+#key23 <- read_delim("data/ZAF/RangeX_Metadata_ZAF_22_23_final1.csv") %>%
+#  clean_names()
+
+key23 <- read_delim("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/South Africa/Retreat ZAF/RangeX_Metadata_ZAF_22_23_final1.csv") %>%
+  clean_names()
+
+key <- read_delim("data/ZAF/RangeX_FocalMetadata_ZAF_clean.csv") %>%
   clean_names()
 
 key_raw <- read_delim("data/ZAF/RangeX_Metadata_ZAF_clean.csv") %>%
   clean_names()
 
+
+
+# check whether RangeX_Metadata_ZAF_22_23_final1.csv and the same file after processing are identical
+all.equal(key23, key) # of course not, must be pre-processed
 
 # define useful vector
 
@@ -138,8 +186,6 @@ dat_YS21 <- dat_YS21 %>%
 ### SPECIES NEEDS TO BE REMOVED HERE EVENTUALLY!!!
   #dplyr::select(-"species") #-"month", -"year", 
 
-
-
 # change them to new names
 dat_YS21 <- dat_YS21 %>%
   rename("height_vegetative_str" = "vh",
@@ -161,12 +207,17 @@ dat_YS21[, missing_col] <- NA
 
 ### ADD TREATMENTS ETC. ########################################################
 
+
+# prepare treatment key & filter out 2021/ 22 metadata (there will be merging problems otherwise)
+
+
 # prepare treatment key
 key <- key_raw %>%
   filter(region == "ZAF") %>%
   mutate(block_id_original = as.character(block_id_original),
          position_id_original = as.integer(position_id_original),
          plot_id_original = as.character(plot_id_original),
+         plant_id_original = as.character(plant_id_original)) %>%
          plant_id_original = as.character(plant_id_original))
 
 # filter out 2021/ 22 metadata (there will be merging problems otherwise)
@@ -175,11 +226,20 @@ key21 <- key %>%
 
 # merge treatments to 2021 size data frame
 dat_YS21_merged <- left_join(dat_YS21 |> 
+                               rename("sp" = species), key21, by = c("region", "site", "block_id_original", "plot_id_original", "position_id_original"))
                                ### RENAME NEEDS NOT TO HAPPEN IN THE FINAL VERSION WHEN SPECIES IN THE DATA IS REMOVED!!!
                                rename("sp" = species), key21, by = c("region", "site", "block_id_original", "plot_id_original", "position_id_original")) |> 
   mutate(species = str_trim(species, "left"),
          species = str_trim(species, "right"))
 
+
+# check whether species are correct
+check_sp <- dat_YS21_merged %>%
+  dplyr::select(species, sp) %>%
+  distinct(species, sp)
+
+# REMAINING PROBLEMS:
+# eracap contains Eragrostis capensis as well as Eragrostis curvula
 
 ### MISSING ENTRIES/ VALUES/ NA's ##############################################
 
@@ -222,11 +282,6 @@ dat_YS23_lo <- dat_YS23_lo %>%
 
 
 
-### check warning: "mutate: converted 'vw_oct_22' from character to double (2 new NA) 
-### converted 'vw_march_23' from character to double (1 new NA)
-
-
-
 # merge high and low data sets
 dat_YS23 <- bind_rows(dat_YS23_hi, dat_YS23_lo)
 
@@ -240,12 +295,15 @@ dat_YS23 <- dat_YS23 %>%
   pivot_wider(names_from = variable,
               values_from = value)
 
-
 # make some manipulations to be able to merge key on
 dat_YS23 <- dat_YS23 %>%
+  mutate(region = "ZAF") %>%
+  rename("plot_id_original" = "plot_id", "block_id_original" = "block_id",
+         "position_id_original" = "position_id")
   mutate(region = "ZAF") #%>%
 ### SPECIES NEEDS TO BE REMOVED HERE EVENTUALLY!!!
   #dplyr::select(-"species") #-"month", -"year", 
+
 
 
 
@@ -269,6 +327,32 @@ dat_YS23[, missing_col] <- NA
 ### ADD TREATMENTS ETC. ########################################################
 
 
+# prepare treatment key
+key23 <- key23 %>%
+  rename("plot_id" = plot_id_original) |> 
+  mutate(block_id_original = as.character(block_id),
+         position_id_original = as.character(position_id),
+         plot_id_original = as.character(plot_id),
+         plant_id_original = as.character(plant_id_original)) |> 
+  # grab plant replacement, group by unique position id and filter for largest number, which is the plant that was replaced
+  mutate(ind_nr = stringr::str_extract(unique_plant_id, stringr::regex("(\\d+)(?!.*\\d)"))) |> 
+  group_by(unique_position_id, region, site, block_id_original, plot_id_original, position_id_original, species) |> 
+  tidylog::summarise(ind_nr = max(ind_nr)) |> 
+  mutate(unique_plant_id = paste0(unique_position_id, ".", ind_nr))
+
+## make key out of clean metadata
+#key23 <- key %>%
+#  mutate(block_id_original = as.character(block_id_original),
+#         position_id_original = as.character(position_id_original),
+#         plot_id_original = as.character(plot_id_original),
+#         plant_id_original = as.character(plant_id_original)) %>%
+#  group_by(region, site, block_id_original, plot_id_original, position_id_original,
+#           unique_position_id, treat_warming, treat_competition, unique_plot_id) %>%
+#  tidylog::filter(plant_id_original == max(plant_id_original)) 
+  
+
+
+
 key23 <- key_raw %>%
   filter(region == "ZAF") |> 
   mutate(position_id_original = as.character(position_id_original),
@@ -281,12 +365,43 @@ key23 <- key_raw %>%
 
 
 
-# merge treatments to 2021 size data frame
+
+
+###*************************************************************************----
+
+# REMAINING PROBLEM: Using RangeX_Metadata_ZAF_22_23_final1.csv works alright, but the cleaned and 
+# merged metadata (based on RangeX_Metadata_ZAF_22_23_final1.csv) still doesn't despite fixing the
+# merging error.
+
+###*************************************************************************----
+
+
+
+
+# merge treatments to 2023 size data frame
 dat_YS23_merged <- tidylog::left_join(dat_YS23 |> 
-                                        ### RENAME NEEDS NOT TO HAPPEN IN THE FINAL VERSION WHEN SPECIES IN THE DATA IS REMOVED!!!
                      rename("sp" = species), key23, by = c("region", "site", "block_id_original", "plot_id_original", "position_id_original"))
 
+# check whether species are correct
+check_sp <- dat_YS23_merged %>%
+  dplyr::select(species, sp) %>%
+  distinct(species, sp)
 
+# REMAINING PROBLEMS:
+# everything
+
+
+dat_YS23_merged |> 
+  #count(species, sp) |> 
+  mutate(sp = tolower(sp),
+         species3 = substr(species, 1, 3),
+         sp3 = substr(sp, 1, 3)) |> 
+  filter(species3 != sp3) |> 
+  select(functional_group, sp, species, everything()) %>%
+### RENAME NEEDS NOT TO HAPPEN IN THE FINAL VERSION WHEN SPECIES IN THE DATA IS REMOVED!!!
+  rename("sp" = species), key23, by = c("region", "site", "block_id_original", "plot_id_original", "position_id_original"))
+
+write_csv(., "check_metadata.csv")
 
 # check if species names are correct from data and metadata
 dat_YS23_merged |> count(species, sp) |> arrange(species) |> print(n = Inf)
