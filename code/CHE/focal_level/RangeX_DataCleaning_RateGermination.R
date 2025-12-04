@@ -27,19 +27,19 @@ library(lubridate) # handle dates
 ### LOAD DATA SET ##############################################################
 
 # load germination/establishment data
-dat_germ2 <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Germination/Germination 2.0/RangeX_raw_Germination2_2023.csv")
+dat_germ2 <- read.csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/3_DataRaw/Raw_FocalLevel/Raw_Germination/RangeX_raw_Germination2_2023.csv")
 dat_germ2_org <- dat_germ2
-dat_germ1 <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Germination/Germination 1.0/RangeX_raw_Germination1_2022.csv")
+dat_germ1 <- read.csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/3_DataRaw/Raw_FocalLevel/Raw_Germination/RangeX_raw_Germination1_2022.csv")
 dat_germ1_org <- dat_germ1
 
 # load seeds-per-toothpick data 
-dat_seed1 <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Germination/Germination 1.0/RangeX_raw_Germination1_SeedNo_2021.csv")
+dat_seed1 <- read.csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/3_DataRaw/Raw_FocalLevel/Raw_Germination/RangeX_raw_Germination1_SeedNo_2021.csv")
 dat_seed1_org <- dat_seed1
-dat_seed2 <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Germination/Germination 2.0/RangeX_raw_Germination2_SeedNo_2022.csv")
+dat_seed2 <- read.csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/3_DataRaw/Raw_FocalLevel/Raw_Germination/RangeX_raw_Germination2_SeedNo_2022.csv")
 dat_seed2_org <- dat_seed2
 
 # load treatment key (on plot level, not focal individual level!)
-meta_plot <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/metadata/RangeX_clean_MetadataPlot_CHE.csv")
+meta_plot <- read.csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/1_Metadata/2_Metadata_FocalsPlots/RangeX_clean_MetadataPlot_CHE.csv")
 
 # define useful vector
 species_names <- c("Brachypodium pinnatum" = "brapin", "Bromus erectus" = "broere", "Daucus carota" = "daucar", "Hypericum perforatum" = "hypper",
@@ -393,8 +393,8 @@ unique(dat_germ_complete$value)
 
 ### SAVE CLEAN VERSION #########################################################
 
-write.csv(dat_germ_complete, "/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Germination/RangeX_clean_RateGermination_2022_2023_CHE.csv",
-          row.names = FALSE)
+#write.csv(dat_germ_complete, "/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/6_DataClean/RangeX_clean_RateGermination_2022_2023_CHE.csv",
+#          row.names = FALSE)
 
 
 ################################################################################
@@ -439,6 +439,31 @@ str(dat_seed_complete)
 
 ### SAVE CLEAN VERSION #########################################################
 
-write.csv(dat_seed_complete, "/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Germination/RangeX_clean_SeedNoGermination_2021_2022_CHE.csv",
-          row.names = FALSE)
+#write.csv(dat_seed_complete, "/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/6_DataClean/RangeX_clean_SeedNoGermination_2021_2022_CHE.csv",
+#          row.names = FALSE)
 
+
+################################################################################
+### ADD AVERAGE SEEDS PER TOOTHPICK ############################################
+################################################################################
+
+# calculate the avergae no. seeds per toothpick and add this as a fixed variable to the germination rate data frame
+
+# calculate average number of seeds per stick
+summary_sticks <- dat_seed_complete %>%
+  group_by(species, experiment) %>%
+  summarize(mean_seedno = mean(seedcount),
+            mean_seedno = round(mean_seedno, digits=0))
+
+# add as variable back on to dat_germ_complete
+dat_germ_complete <- dat_germ_complete %>%
+  mutate(experiment = str_extract(germination_position_ID, "exp[0-9]+")) %>%
+  left_join(summary_sticks, by = c("species", "experiment"))
+
+# double-check
+dat_germ_complete %>%
+  distinct(species, experiment, mean_seedno) # looks good
+
+# prepare for export
+write.csv(dat_germ_complete, "/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/6_DataClean/RangeX_clean_RateGermination_2022_2023_CHE.csv",
+          row.names = FALSE)
