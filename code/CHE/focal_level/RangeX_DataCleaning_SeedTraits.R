@@ -23,11 +23,15 @@ library(stringr) # working with regex
 ### LOAD DATA SET ##############################################################
 
 # load data
-number_org <- read_csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Traits/Seeds/RangeX_raw_SeedNumber_2022.csv")
-weight_org <- read_csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Traits/Seeds/RangeX_raw_SeedWeight_2022.csv")
+#number_org <- read_csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Traits/Seeds/RangeX_raw_SeedNumber_2022.csv")
+#weight_org <- read_csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Traits/Seeds/RangeX_raw_SeedWeight_2022.csv")
+
+number_org <- read_csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/3_DataRaw/Raw_FocalLevel/Raw_Seeds/RangeX_raw_SeedNumber_2022.csv")
+weight_org <- read_csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/3_DataRaw/Raw_FocalLevel/Raw_Seeds/RangeX_raw_SeedWeight_2022.csv")
 
 # load treatment key
-meta_plant <- read_csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/metadata/RangeX_clean_MetadataFocal_CHE.csv")
+#meta_plant <- read_csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/metadata/RangeX_clean_MetadataFocal_CHE.csv")
+meta_plant <- read.csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/1_Metadata/2_Metadata_FocalsPlots/RangeX_clean_MetadataFocal_CHE.csv")
 
 
 # wanted columns & data types
@@ -522,12 +526,15 @@ seed_combined <- seed_combined %>%
 seed_combined <- seed_combined %>% 
   mutate(across(c(1:6), \(x) str_remove_all(x, pattern = fixed(" "))))
 
-
+# change typo in date of CHE.lo.ambi.bare.wf.08.19.1 (2022, not 2024)
+seed_combined[seed_combined$unique_plant_ID == "CHE.lo.ambi.bare.wf.08.19.1", ]$date_collection <- "23.06.2022"
+  
 # change data types
 seed_combined <- seed_combined %>%
   mutate(across(all_of(numeric_cols), as.numeric),
          across(all_of(string_cols), as.character),
          date_collection = as.Date(date_collection, format = "%d.%m.%Y")) # no new NA's, great
+
 
 
 # final NA check
@@ -569,6 +576,7 @@ ggplot(data = seed_combined_plot[seed_combined_plot$site == "hi",], aes(x = vari
 
 ### SAVE CLEAN VERSION #########################################################
 
-write.csv(seed_combined, "/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Traits/Seeds/RangeX_clean_SeedTraits_2022_CHE.csv",
+#write.csv(seed_combined, "/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Traits/Seeds/RangeX_clean_SeedTraits_2022_CHE.csv",
+#          row.names = FALSE)
+write.csv(seed_combined, "/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/6_DataClean/RangeX_clean_SeedTraits_2022_CHE.csv",
           row.names = FALSE)
-
