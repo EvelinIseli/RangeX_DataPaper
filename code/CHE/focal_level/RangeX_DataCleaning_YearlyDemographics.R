@@ -25,21 +25,26 @@ library(stringr) # working with regex
 ### LOAD DATA SET ##############################################################
 
 # load demographic data
-dat_YS21 <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Yearly Size Measurements/YearlySize 2021/RangeX_raw_YearlySize_2021.csv")
+#dat_YS21 <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Yearly Size Measurements/YearlySize 2021/RangeX_raw_YearlySize_2021.csv")
+dat_YS21 <- read.csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/3_DataRaw/Raw_FocalLevel/Raw_YearlySize/RangeX_raw_YearlySize_2021.csv")
 dat_YS21_org <- dat_YS21
 
-dat_YS22 <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Yearly Size Measurements/YearlySize 2022/RangeX_raw_YearlySize_2022.csv")
+#dat_YS22 <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Yearly Size Measurements/YearlySize 2022/RangeX_raw_YearlySize_2022.csv")
+dat_YS22 <- read.csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/3_DataRaw/Raw_FocalLevel/Raw_YearlySize/RangeX_raw_YearlySize_2022.csv")
 dat_YS22_org <- dat_YS22
 
-dat_YS23 <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Yearly Size Measurements/YearlySize 2023/RangeX_raw_YearlySize_2023.csv")
+#dat_YS23 <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Yearly Size Measurements/YearlySize 2023/RangeX_raw_YearlySize_2023.csv")
+dat_YS23 <- read.csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/3_DataRaw/Raw_FocalLevel/Raw_YearlySize/RangeX_raw_YearlySize_2023.csv")
 dat_YS23_org <- dat_YS23
 
 # load additional measurements from 2022 for 
-dat_YS22_CenjacAut <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Yearly Size Measurements/YearlySize 2022/RangeX_raw_AutumnNew_Cenjac_2022.csv")
+#dat_YS22_CenjacAut <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Yearly Size Measurements/YearlySize 2022/RangeX_raw_AutumnNew_Cenjac_2022.csv")
+dat_YS22_CenjacAut <- read.csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/3_DataRaw/Raw_FocalLevel/Raw_YearlySize/RangeX_raw_AutumnNew_Cenjac_2022.csv")
 dat_YS22_CenjacAut_org <- dat_YS22_CenjacAut
 
 # load treatment key
-meta_plant <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/metadata/RangeX_clean_MetadataFocal_CHE.csv")
+#meta_plant <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/metadata/RangeX_clean_MetadataFocal_CHE.csv")
+meta_plant <- read.csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/1_Metadata/2_Metadata_FocalsPlots/RangeX_clean_MetadataFocal_CHE.csv")
 
 # define useful vector
 species_names <- c("Brachypodium pinnatum" = "brapin", "Bromus erectus" = "broere", "Daucus carota" = "daucar", "Hypericum perforatum" = "hypper",
@@ -189,6 +194,11 @@ inflor_size <- dat_YS21[!is.na(dat_YS21$mean_inflorescence_size), ]
 flowers <- dat_YS21[!is.na(dat_YS21$number_flowers), ]
 
 # for all plameds only 1 inflorescence was measured, even if there were multiple flowers/ only for the 1 flowering broere both inflorescences were measured
+
+# typo in daucar 13 of plot 3.1
+dat_YS21 %>%
+  filter(unique_plant_ID == "CHE.lo.ambi.vege.wf.03.13.1") # scanned data sheet says 284 mm instead of 984 for leaf length 3
+dat_YS21[dat_YS21$unique_plant_ID == "CHE.lo.ambi.vege.wf.03.13.1" & dat_YS21$species == "daucar",]$leaf_length3 <- 284
 
 # check for dublicated unique IDs
 any(is.na(dat_YS21$unique_plant_ID)) # none, great
@@ -783,6 +793,9 @@ str(dat_YS21_22_23)
 dat_YS21_22_23_na <- dat_YS21_22_23 %>% 
   filter(is.na(unique_plant_ID) | is.na(collector) | is.na(date_measurement) | is.na(species)) # all good
 
+# --> the 36 individuals with NA for measurement_date are the rows for the individuals replanted after measuring yearly_size in 2021
+
+
 # check for dublicated unique IDs
 any(is.na(dat_YS21_22_23$unique_plant_ID)) # none, great
 
@@ -883,7 +896,8 @@ dat_YS21_22_23 <- dat_YS21_22_23 %>%
 
 
 # check whether there's initial size measurements of all 1836 individuals included in YearlySize
-dat_InS <- read_csv( "/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Initial Size Measurements/RangeX_clean_InitialSize_2021_CHE.csv")
+#dat_InS <- read_csv( "/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Initial Size Measurements/RangeX_clean_InitialSize_2021_CHE.csv")
+dat_InS <- read_csv( "/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/6_DataClean/RangeX_clean_InitialSize_2021_CHE.csv")
 
 completness_check <- left_join(illogical_survival_peak, dat_InS, by = "unique_plant_ID")
 
@@ -962,8 +976,9 @@ ggplot(data = dat_YS21_22_23_plot[dat_YS21_22_23_plot$site == "hi",], aes(x = va
 ### SAVE CLEAN VERSION #########################################################
 
 
-write.csv(dat_YS21_22_23, "/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Yearly Size Measurements/RangeX_clean_YearlyDemographics_2021_2023_CHE.csv",
+#write.csv(dat_YS21_22_23, "/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Yearly Size Measurements/RangeX_clean_YearlyDemographics_2021_2023_CHE.csv",
+#          row.names = FALSE)
+write.csv(dat_YS21_22_23, "/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/6_DataClean/RangeX_clean_YearlyDemographics_2021_2023_CHE.csv",
           row.names = FALSE)
-
 
 
