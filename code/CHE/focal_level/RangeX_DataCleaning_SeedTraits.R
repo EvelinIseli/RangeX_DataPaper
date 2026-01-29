@@ -515,6 +515,17 @@ seed_combined <- seed_combined %>%
 
 # done
 
+# number of seeds existing, but not seedweight: only two cases (CHE.hi.ambi.vege.wf.01.29.2, CHE.hi.ambi.vege.wf.05.02.1)
+# --> set to zero, if seeds were lost between counting and weighting not sure whether counts can be trusted
+seed_combined[seed_combined$unique_plant_ID == "CHE.hi.ambi.vege.wf.01.29.2",]$no_seeds <- 0
+seed_combined[seed_combined$unique_plant_ID == "CHE.hi.ambi.vege.wf.05.02.1",]$no_seeds <- 0
+
+# seed weight existing, but no seeds counted for number: 7 cases, 6 brapin, 1 daucar
+# --> No_Seeds_Weighted are precise numbers (i.e. real counts of all the seeds in the bags, not reduced counts), so can be used as no_seeds
+seed_combined <- seed_combined %>%
+  mutate(no_seeds = ifelse(no_seeds == 0 & No_Seeds_Weighted != 0, No_Seeds_Weighted, no_seeds))
+
+
 ### DELETE & ADD COLUMNS, DATATYPES, SAVE CLEAN VERSION ########################
 
 
