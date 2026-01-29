@@ -25,11 +25,13 @@ library(stringr) # working with regex
 ### LOAD DATA SET ##############################################################
 
 # load biomass data
-dat_bio23 <- read_csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Biomass/Biomass Focals/RangeX_raw_BiomassDryweight_2023.csv")
+#dat_bio23 <- read_csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Biomass/Biomass Focals/RangeX_raw_BiomassDryweight_2023.csv")
+dat_bio23 <- read_csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/3_DataRaw/Raw_FocalLevel/Raw_Biomass/RangeX_raw_BiomassDryweight_2023.csv")
 dat_bio23_org <- dat_bio23
 
 # load treatment key
-meta_plant <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/metadata/RangeX_clean_MetadataFocal_CHE.csv")
+#meta_plant <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/metadata/RangeX_clean_MetadataFocal_CHE.csv")
+meta_plant <- read.csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/1_Metadata/2_Metadata_FocalsPlots/RangeX_clean_MetadataFocal_CHE.csv")
 
 # define useful vector
 species_names <- c("Brachypodium pinnatum" = "brapin", "Bromus erectus" = "broere", "Daucus carota" = "daucar", "Hypericum perforatum" = "hypper",
@@ -129,7 +131,7 @@ dat_bio23 <- dat_bio23 %>%
 
 # check whether there are any mistaken NA in metadata columns
 dat_bio23_na <- dat_bio23 %>% 
-  filter(is.na(unique_plant_ID) | is.na(date_collection) | is.na(species)) # 3 rows with no collection date as bags missing --> deduce from collection
+  filter(is.na(unique_plant_ID) | is.na(date_collection) | is.na(species)) # 3 rows with no collection date as bags missing --> leave as is, there's no measurements either
 
 # check for NAs: filter all rows with NA's in vegetative height and number of leaves (they are probably dead --> can only be checked with 2023 survival check or phenology data)
 dat_bio23_na <- dat_bio23 %>% 
