@@ -25,8 +25,10 @@ library(stringr) # working with regex
 ### LOAD DATA SET ##############################################################
 
 # loading data
-dat_InS <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Initial Size Measurements/RangeX_raw_InitialSize_2021.csv")
-meta_plant <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Metadata/RangeX_clean_MetadataFocal_CHE.csv")
+#dat_InS <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Initial Size Measurements/RangeX_raw_InitialSize_2021.csv")
+#meta_plant <- read.csv("/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Metadata/RangeX_clean_MetadataFocal_CHE.csv")
+dat_InS <- read.csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/3_DataRaw/Raw_FocalLevel/Raw_InitialSize/RangeX_raw_InitialSize_2021.csv")
+meta_plant <- read.csv("/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/1_Metadata/2_Metadata_FocalsPlots/RangeX_clean_MetadataFocal_CHE.csv")
 
 functional_groups <- c("brapin" = "graminoid", "broere" = "graminoid", "daucar" = "forb", "hypper" = "forb",
                        "medlup" = "legume", "plamed" = "forb", "silvul" = "forb", "scacol" = "forb",
@@ -268,6 +270,10 @@ dat_InS <- dat_InS %>%
          across(all_of(string_cols), as.character),
          date_measurement = as.Date(date_measurement, format = "%Y-%m-%d"), 
          date_planting = as.Date(date_planting, format = "%Y-%m-%d"))
+
+# correct typo in date
+dat_InS[dat_InS$unique_plant_ID == "CHE.hi.ambi.vege.wf.03.19.1",]$date_measurement <- as.Date("2021-06-24", format = "%Y-%m-%d")
+
 
 # save clean version
 write.csv(dat_InS, "/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Initial Size Measurements/RangeX_clean_InitialSize_2021_CHE.csv",
