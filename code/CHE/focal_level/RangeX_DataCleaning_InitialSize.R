@@ -276,6 +276,8 @@ dat_InS[dat_InS$unique_plant_ID == "CHE.hi.ambi.vege.wf.03.19.1",]$date_measurem
 
 
 # save clean version
-write.csv(dat_InS, "/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Initial Size Measurements/RangeX_clean_InitialSize_2021_CHE.csv",
+#write.csv(dat_InS, "/Users/eviseli/Desktop/RangeX/Task 1.1 Drivers/Calanda/Data/Digitalized Raw Data/Survival & Demographics/Initial Size Measurements/RangeX_clean_InitialSize_2021_CHE.csv",
+#          row.names = FALSE)
+write.csv(dat_InS, "/Users/mac/Desktop/ETH_Phd+/Projects/RangeX/RangeX_Data/6_DataClean/RangeX_clean_InitialSize_2021_CHE.csv",
           row.names = FALSE)
 
